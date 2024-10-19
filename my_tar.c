@@ -41,54 +41,51 @@ void my_error(const char *message){
     write(2, message, my_strlen(message)); 
 }
 
-int main(int argc, char * argv[]){
-    int op_c = 0;
-    int op_r = 0;
-    int op_t = 0;
-    int op_u = 0;
-    int op_x = 0;
-    int op_f = 0;
+int main(int argc, char *argv[]) {
+    int op_c = 0, op_r = 0, op_t = 0, op_u = 0, op_x = 0, op_f = 0;
     const char *archive_name = NULL;
 
-   if(argc < 4){
-      my_error("Missing required arguments\n");
-      return 1;
-   }
+    if (argc < 4) {
+        my_error("Missing required arguments\n");
+        return 1;
+    }
 
-   for(int i = 1; i < argc; i++){
-       if(argv[i][0] == '-'){
-           for(int j = 1; argv[i][j] != '\0'; j++){
-               if(argv[i][j] == 'c'){
-                   op_c = 1;
-               } else if(argv[i][j] == 'r'){
-                   op_r =1;
-               } else if(argv[i][j] == 't'){
-                   op_t = 1;
-               } else if(argv[i][j] == 'u'){
-                   op_u =1;
-               } else if(argv[i][j] == 'x'){
-                   op_x = 1;
-               } else if(argv[i][j] == 'f'){
-                   op_f = 1;
-                   if(i + 1 < argc){
-                      archive_name = argv[i + 1];
-                      i++;
-                   } else {
-                       my_error("Error: Archive name must be provided for -f option.\n");
-                       return 1;
-                   }
-               } else {
-                   my_error("Wrong flag\n");
-                   return 1;
-               }
-           }
-       }
-   }
+    for (int i = 1; i < argc; i++) {
+        if (argv[i][0] == '-') {
+            char *flags = argv[i] + 1;
+            while (*flags) {
+                switch (*flags++) {
+                    case 'c': op_c = 1; break;
+                    case 'r': op_r = 1; break;
+                    case 't': op_t = 1; break;
+                    case 'u': op_u = 1; break;
+                    case 'x': op_x = 1; break;
+                    case 'f': 
+                        op_f = 1;
+                        if (i + 1 < argc) {
+                            archive_name = argv[++i];
+                        } else {
+                            my_error("Error: Archive name must be provided for -f option.\n");
+                            return 1;
+                        }
+                        break;
+                    default:
+                        my_error("Unknown flag\n");
+                        return 1;
+                }
+            }
+        }
+    }
 
-   if((op_r || op_u || op_c) && !op_f){
-       my_error("The -f option is required\n");
-       return 1;
-   }
-
-   return 0;
+    if ((op_r || op_u || op_c) && !op_f) {
+        my_error("The -f option is required\n");
+        return 1;
+    }
+    // tests to check output
+    printf("Flags: c=%d, r=%d, u=%d, f=%d, t=%d, x=%d\n", op_c, op_r, op_u, op_f, op_t, op_x);
+    if (op_f && archive_name != NULL) {
+        printf("Archive name: %s\n", archive_name);  
+    }
+    
+    return 0;
 }
